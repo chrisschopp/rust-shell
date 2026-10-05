@@ -11,19 +11,26 @@ fn main() {
         raw_input = raw_input.trim().to_string();
 
         // Split to get command and any arguments passed
-        let inputs: Vec<&str> = raw_input.split_once(' ').collect();
-        let command = inputs[0];
-        if command.eq("echo") {
-            if inputs.len() > 1 {
-                let arguments = &inputs[1].to_string();
-                println!("{arguments}");
-            } else {
-            }
-        } else if command.eq("exit") {
+        let opts: Option<(&str, &str)> = raw_input.split_once(' ');
+        match opts {
+            Some((command, arguments)) => command_with_args(command, arguments),
+            None => command_not_found(&raw_input),
+        }
+        if raw_input.eq("exit") {
             break;
-        } else {
-            eprintln!("{}: command not found", command);
         }
         io::stdout().flush().unwrap();
     }
+}
+
+fn command_with_args(command: &str, arguments: &str) {
+    if command == "echo" {
+        println!("{arguments}");
+    } else {
+        command_not_found(command);
+    }
+}
+
+fn command_not_found(command: &str) {
+    println!("{command}: command not found");
 }
