@@ -32,5 +32,7 @@ fn command_with_args(command: &str, arguments: &str) {
 }
 
 fn command_not_found(command: &str) {
-    println!("{command}: command not found");
+    if command != "exit" {
+        println!("{command}: command not found");
+    }
 }
