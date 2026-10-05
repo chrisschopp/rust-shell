@@ -14,7 +14,11 @@ fn main() {
         let inputs: Vec<&str> = raw_input.split(' ').collect();
         let command = inputs[0];
         if command.eq("echo") {
-            println!("{command}");
+            if inputs.len() > 1 {
+                let arguments = &inputs[1].to_string();
+                println!("{arguments}");
+            } else {
+            }
         } else if command.eq("exit") {
             break;
         } else {
