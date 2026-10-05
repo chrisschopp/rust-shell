@@ -11,7 +11,7 @@ fn main() {
         raw_input = raw_input.trim().to_string();
 
         // Split to get command and any arguments passed
-        let inputs: Vec<&str> = raw_input.split(' ').collect();
+        let inputs: Vec<&str> = raw_input.split_once(' ').collect();
         let command = inputs[0];
         if command.eq("echo") {
             if inputs.len() > 1 {
