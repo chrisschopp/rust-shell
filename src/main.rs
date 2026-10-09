@@ -30,7 +30,10 @@ fn get_type(inputs: &Vec<&str>) {
     valid_commands.insert("echo".to_string());
     valid_commands.insert("type".to_string());
     if valid_commands.contains(inputs[0]) {
-        println!("{} is a shell builtin", inputs[0])
+        println!("{} is a shell builtin", inputs[0]);
+        if inputs.len() > 1 {
+            get_type(&inputs[1..].to_vec());
+        }
     } else {
         println!("{}: not found", inputs[0])
     }
