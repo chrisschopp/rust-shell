@@ -1,4 +1,5 @@
 use std::collections::HashSet;
+use std::env;
 #[allow(unused_imports)]
 use std::io::{self, Write};
 
@@ -18,7 +19,7 @@ fn main() {
             "exit" => break,
             "echo" => println!("{}", splitted_inputs.join(" ")),
             "type" => get_type(&splitted_inputs),
-            _ => println!("{command}: command not found"),
+            _ => not_found(command),
         }
         io::stdout().flush().unwrap();
     }
@@ -35,6 +36,21 @@ fn get_type(inputs: &Vec<&str>) {
             get_type(&inputs[1..].to_vec());
         }
     } else {
-        println!("{}: not found", inputs[0])
+        println!("{}: command not found", inputs[0])
     }
+}
+
+fn not_found(command: &str) {
+    println!("{command}: command not found")
+}
+
+fn search_executables(command: &str) {
+    // go through PATH
+    let path = match env::var("PATH") {
+        Ok(str) => str,
+        Err(error) => panic!("No PATH variable found: {error:?}"),
+    };
+    let paths = path.split(":");
+    dbg!(paths);
+    not_found(command);
 }
