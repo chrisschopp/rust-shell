@@ -30,9 +30,12 @@ fn get_type(inputs: &Vec<&str>) {
     valid_commands.insert("exit".to_string());
     valid_commands.insert("echo".to_string());
     valid_commands.insert("type".to_string());
-    if valid_commands.contains(inputs[0]) {
-        println!("{} is a shell builtin", inputs[0]);
+    let command = inputs[0];
+    // first check builtins
+    if valid_commands.contains(command) {
+        println!("{} is a shell builtin", command);
         if inputs.len() > 1 {
+            // check all inputs passed to type
             get_type(&inputs[1..].to_vec());
         }
     } else {
@@ -44,13 +47,13 @@ fn not_found(command: &str) {
     println!("{command}: command not found")
 }
 
-fn search_executables(command: &str) {
+fn executable_path(command: &str) -> () {
     // go through PATH
     let path = match env::var("PATH") {
         Ok(str) => str,
         Err(error) => panic!("No PATH variable found: {error:?}"),
     };
-    let paths = path.split(":");
+    let paths: Vec<&str> = path.split(":").collect();
     dbg!(paths);
     not_found(command);
 }
