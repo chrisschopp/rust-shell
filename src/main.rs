@@ -1,5 +1,6 @@
 use std::collections::HashSet;
 use std::env;
+use std::path::Path;
 #[allow(unused_imports)]
 use std::io::{self, Write};
 
@@ -38,9 +39,9 @@ fn get_type(inputs: &Vec<&str>) {
             // check all inputs passed to type
             get_type(&inputs[1..].to_vec());
         }
-    } else {
-        println!("{}: command not found", inputs[0])
     }
+    // next check executables
+    let _full_path = executable_path(command);
 }
 
 fn not_found(command: &str) {
@@ -53,7 +54,7 @@ fn executable_path(command: &str) -> () {
         Ok(str) => str,
         Err(error) => panic!("No PATH variable found: {error:?}"),
     };
-    let paths: Vec<&str> = path.split(":").collect();
+    let paths: Vec<&Path> = path.split(":").map(Path::new).collect();
     dbg!(paths);
     not_found(command);
 }
