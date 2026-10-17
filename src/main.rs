@@ -1,8 +1,8 @@
 use std::collections::HashSet;
 use std::env;
-use std::path::Path;
 #[allow(unused_imports)]
 use std::io::{self, Write};
+use std::path::{Path, PathBuf};
 
 fn main() {
     // TODO: Uncomment the code below to pass the first stage
@@ -50,11 +50,20 @@ fn not_found(command: &str) {
 
 fn executable_path(command: &str) -> () {
     // go through PATH
-    let path = match env::var("PATH") {
+    let env_path = match env::var("PATH") {
         Ok(str) => str,
         Err(error) => panic!("No PATH variable found: {error:?}"),
     };
-    let paths: Vec<&Path> = path.split(":").map(Path::new).collect();
+    let paths: Vec<PathBuf> = env_path
+        .split(":")
+        .map(Path::new)
+        .map(|dir| dir.join(command))
+        .collect();
+    // check if file with command name exists
+    let first_matching_file = paths
+        .iter()
+        .find(|&file| file.exists());
+    dbg!(first_matching_file.unwrap());
     dbg!(paths);
     not_found(command);
 }
