@@ -40,9 +40,10 @@ fn get_type(inputs: &Vec<&str>) {
             // check all inputs passed to type
             get_type(&inputs[1..].to_vec());
         }
+    } else {
+        // next check executables
+        let _full_path = executable_path(command);
     }
-    // next check executables
-    let _full_path = executable_path(command);
 }
 
 fn not_found(command: &str) {
@@ -58,9 +59,10 @@ fn executable_path(command: &str) -> () {
     let paths: Vec<PathBuf> = env::split_paths(&env_path)
         .map(|dir| dir.join(command))
         .collect();
-    // check if file with command name exists
+    // check if file with command name exists and is executable
     let first_matching_file = paths.iter().find(|&file| file.exists() & file.executable());
-    dbg!(first_matching_file.unwrap());
-    // dbg!(paths);
-    not_found(command);
+    match first_matching_file {
+        Some(f) => println!("{command} is {f:?}"),
+        None => not_found(command),
+    }
 }
