@@ -1,8 +1,9 @@
+use faccess::PathExt;
 use std::collections::HashSet;
 use std::env;
 #[allow(unused_imports)]
 use std::io::{self, Write};
-use std::path::{Path, PathBuf};
+use std::path::PathBuf;
 
 fn main() {
     // TODO: Uncomment the code below to pass the first stage
@@ -58,7 +59,7 @@ fn executable_path(command: &str) -> () {
         .map(|dir| dir.join(command))
         .collect();
     // check if file with command name exists
-    let first_matching_file = paths.iter().find(|&file| file.exists());
+    let first_matching_file = paths.iter().find(|&file| file.exists() & file.executable());
     dbg!(first_matching_file.unwrap());
     // dbg!(paths);
     not_found(command);
