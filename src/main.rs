@@ -54,16 +54,12 @@ fn executable_path(command: &str) -> () {
         Ok(str) => str,
         Err(error) => panic!("No PATH variable found: {error:?}"),
     };
-    let paths: Vec<PathBuf> = env_path
-        .split(":")
-        .map(Path::new)
+    let paths: Vec<PathBuf> = env::split_paths(&env_path)
         .map(|dir| dir.join(command))
         .collect();
     // check if file with command name exists
-    let first_matching_file = paths
-        .iter()
-        .find(|&file| file.exists());
+    let first_matching_file = paths.iter().find(|&file| file.exists());
     dbg!(first_matching_file.unwrap());
-    dbg!(paths);
+    // dbg!(paths);
     not_found(command);
 }
