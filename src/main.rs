@@ -47,7 +47,7 @@ fn get_type(inputs: &Vec<&str>) {
 }
 
 fn not_found(command: &str) {
-    println!("{command}: command not found")
+    println!("{command}: not found")
 }
 
 fn executable_path(command: &str) -> () {
@@ -62,7 +62,7 @@ fn executable_path(command: &str) -> () {
     // check if file with command name exists and is executable
     let first_matching_file = paths.iter().find(|&file| file.exists() & file.executable());
     match first_matching_file {
-        Some(f) => println!("{command} is {f:?}"),
+        Some(f) => println!("{command} is {}", f.display()),
         None => not_found(command),
     }
 }
