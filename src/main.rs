@@ -42,7 +42,7 @@ fn get_type(inputs: &Vec<&str>) {
         }
     } else {
         // next check executables
-        let _full_path = executable_path(command);
+        executable_path(command);
     }
 }
 
