@@ -42,7 +42,11 @@ fn get_type(inputs: &Vec<&str>) {
         }
     } else {
         // next check executables
-        executable_path(command);
+        let file_path = executable_path(command);
+        match file_path {
+            Some(f) => println!("{command} is {}", f.display()),
+            None => not_found(command),
+        }
     }
 }
 
@@ -50,7 +54,7 @@ fn not_found(command: &str) {
     println!("{command}: not found")
 }
 
-fn executable_path(command: &str) -> () {
+fn executable_path(command: &str) -> Option<PathBuf> {
     // go through PATH
     let env_path = match env::var("PATH") {
         Ok(str) => str,
@@ -61,8 +65,5 @@ fn executable_path(command: &str) -> () {
         .collect();
     // check if file with command name exists and is executable
     let first_matching_file = paths.iter().find(|&file| file.exists() & file.executable());
-    match first_matching_file {
-        Some(f) => println!("{command} is {}", f.display()),
-        None => not_found(command),
-    }
+    first_matching_file.cloned()
 }
