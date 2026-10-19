@@ -1,5 +1,6 @@
 use faccess::PathExt;
 use std::collections::HashSet;
+use std::process::Command;
 use std::env;
 #[allow(unused_imports)]
 use std::io::{self, Write};
@@ -21,7 +22,7 @@ fn main() {
             "exit" => break,
             "echo" => println!("{}", splitted_inputs.join(" ")),
             "type" => get_type(&splitted_inputs),
-            _ => not_found(command),
+            _ => try_executing(command),
         }
         io::stdout().flush().unwrap();
     }
@@ -66,4 +67,13 @@ fn executable_path(command: &str) -> Option<PathBuf> {
     // check if file with command name exists and is executable
     let first_matching_file = paths.iter().find(|&file| file.exists() & file.executable());
     first_matching_file.cloned()
+}
+
+fn try_executing(command: &str) {
+    let file_path = executable_path(command);
+    // how do I show the output in the shell? print! macro?
+    match file_path {
+        Some(f) => Command::new(f.into_os_string()).output(),
+        None => not_found(command),
+    }
 }
