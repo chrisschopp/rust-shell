@@ -1,10 +1,10 @@
 use faccess::PathExt;
 use std::collections::HashSet;
-use std::process::Command;
 use std::env;
 #[allow(unused_imports)]
 use std::io::{self, Write};
 use std::path::PathBuf;
+use std::process::{Command, Stdio};
 
 fn main() {
     // TODO: Uncomment the code below to pass the first stage
@@ -22,7 +22,7 @@ fn main() {
             "exit" => break,
             "echo" => println!("{}", splitted_inputs.join(" ")),
             "type" => get_type(&splitted_inputs),
-            _ => try_executing(command),
+            _ => try_executing(command, &splitted_inputs),
         }
         io::stdout().flush().unwrap();
     }
@@ -69,11 +69,17 @@ fn executable_path(command: &str) -> Option<PathBuf> {
     first_matching_file.cloned()
 }
 
-fn try_executing(command: &str) {
+fn try_executing(command: &str, splitted_inputs: &Vec<&str>) {
     let file_path = executable_path(command);
     // how do I show the output in the shell? print! macro?
-    match file_path {
-        Some(f) => Command::new(f.into_os_string()).output(),
-        None => not_found(command),
+    if file_path.is_some() {
+        let path2exec = file_path.unwrap().into_os_string();
+        let output = Command::new(path2exec)
+            .args(splitted_inputs)
+            .stdout(Stdio::piped())
+            .output()
+            .unwrap();
+        let stdout = String::from_utf8(output.stdout).unwrap();
+        println!("{stdout}");
     }
 }
