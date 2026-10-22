@@ -81,4 +81,7 @@ fn try_executing(command: &str, splitted_inputs: &Vec<&str>) {
         let stdout = String::from_utf8(output.stdout).unwrap();
         print!("{stdout}");
     }
+    if file_path.is_none() {
+        not_found(command);
+    }
 }
