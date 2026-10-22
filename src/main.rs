@@ -73,8 +73,7 @@ fn try_executing(command: &str, splitted_inputs: &Vec<&str>) {
     let file_path = executable_path(command);
     // how do I show the output in the shell? print! macro?
     if file_path.is_some() {
-        let path2exec = file_path.unwrap().into_os_string();
-        let output = Command::new(path2exec)
+        let output = Command::new(command)
             .args(splitted_inputs)
             .stdout(Stdio::piped())
             .output()
