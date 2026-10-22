@@ -79,6 +79,6 @@ fn try_executing(command: &str, splitted_inputs: &Vec<&str>) {
             .output()
             .unwrap();
         let stdout = String::from_utf8(output.stdout).unwrap();
-        println!("{stdout}");
+        print!("{stdout}");
     }
 }
