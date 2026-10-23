@@ -7,7 +7,6 @@ use std::path::PathBuf;
 use std::process::{Command, Stdio};
 
 fn main() {
-    // TODO: Uncomment the code below to pass the first stage
     loop {
         print!("$ ");
         io::stdout().flush().unwrap();
@@ -69,19 +68,20 @@ fn executable_path(command: &str) -> Option<PathBuf> {
     first_matching_file.cloned()
 }
 
-fn try_executing(command: &str, splitted_inputs: &Vec<&str>) {
+fn try_executing(command: &str, arguments: &Vec<&str>) {
     let file_path = executable_path(command);
-    // how do I show the output in the shell? print! macro?
-    if file_path.is_some() {
-        let output = Command::new(command)
-            .args(splitted_inputs)
-            .stdout(Stdio::piped())
-            .output()
-            .unwrap();
-        let stdout = String::from_utf8(output.stdout).unwrap();
-        print!("{stdout}");
+    match file_path {
+        Some(_) => execute(command, arguments),
+        None => not_found(command),
     }
-    if file_path.is_none() {
-        not_found(command);
-    }
+}
+
+fn execute(command: &str, arguments: &Vec<&str>) {
+    let output = Command::new(command)
+        .args(arguments)
+        .stdout(Stdio::piped())
+        .output()
+        .unwrap();
+    let stdout = String::from_utf8(output.stdout).unwrap();
+    print!("{stdout}");
 }
