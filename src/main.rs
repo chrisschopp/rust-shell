@@ -21,6 +21,12 @@ fn main() {
             "exit" => break,
             "echo" => println!("{}", splitted_inputs.join(" ")),
             "type" => get_type(&splitted_inputs),
+            "pwd" => println!(
+                "{}",
+                std::env::current_dir()
+                    .expect("The parent of this shell should have a working directory")
+                    .display()
+            ),
             _ => try_executing(command, &splitted_inputs),
         }
         io::stdout().flush().unwrap();
@@ -32,6 +38,7 @@ fn get_type(inputs: &Vec<&str>) {
     valid_commands.insert("exit".to_string());
     valid_commands.insert("echo".to_string());
     valid_commands.insert("type".to_string());
+    valid_commands.insert("pwd".to_string());
     let command = inputs[0];
     // first check builtins
     if valid_commands.contains(command) {
