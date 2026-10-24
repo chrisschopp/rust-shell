@@ -1,5 +1,4 @@
 use faccess::PathExt;
-use std::collections::HashSet;
 use std::env;
 #[allow(unused_imports)]
 use std::io::{self, Write};
@@ -56,14 +55,9 @@ fn main() {
 }
 
 fn get_type(inputs: &Vec<&str>) {
-    let mut valid_commands = HashSet::new();
-    valid_commands.insert("exit".to_string());
-    valid_commands.insert("echo".to_string());
-    valid_commands.insert("type".to_string());
-    valid_commands.insert("pwd".to_string());
     let command = inputs[0];
     // first check builtins
-    if valid_commands.contains(command) {
+    if Cmd::from_str(command).is_ok() {
         println!("{} is a shell builtin", command);
         if inputs.len() > 1 {
             // check all inputs passed to type
@@ -71,8 +65,7 @@ fn get_type(inputs: &Vec<&str>) {
         }
     } else {
         // next check executables
-        let file_path = executable_path(command);
-        match file_path {
+        match path_to_executable(command) {
             Some(f) => println!("{command} is {}", f.display()),
             None => not_found(command),
         }
@@ -83,7 +76,7 @@ fn not_found(command: &str) {
     println!("{command}: not found")
 }
 
-fn executable_path(command: &str) -> Option<PathBuf> {
+fn path_to_executable(command: &str) -> Option<PathBuf> {
     // go through PATH
     let env_path = match env::var("PATH") {
         Ok(str) => str,
@@ -98,8 +91,7 @@ fn executable_path(command: &str) -> Option<PathBuf> {
 }
 
 fn try_executing(command: &str, arguments: &Vec<&str>) {
-    let file_path = executable_path(command);
-    match file_path {
+    match path_to_executable(command) {
         Some(_) => execute(command, arguments),
         None => not_found(command),
     }
