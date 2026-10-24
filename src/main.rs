@@ -12,6 +12,7 @@ enum Cmd {
     Echo,
     Type,
     Pwd,
+    Cd,
 }
 
 impl FromStr for Cmd {
@@ -22,6 +23,7 @@ impl FromStr for Cmd {
             "echo" => Ok(Cmd::Echo),
             "type" => Ok(Cmd::Type),
             "pwd" => Ok(Cmd::Pwd),
+            "cd" => Ok(Cmd::Cd),
             unknown_cmd => Err(format!("Unknown command {}", unknown_cmd)),
         }
     }
@@ -48,6 +50,7 @@ fn main() {
                     .expect("The parent of this shell should have a working directory")
                     .display()
             ),
+            Ok(Cmd::Cd) => change_directory(&splitted_inputs),
             _ => try_executing(command, &splitted_inputs),
         }
         io::stdout().flush().unwrap();
@@ -105,4 +108,15 @@ fn execute(command: &str, arguments: &Vec<&str>) {
         .unwrap();
     let stdout = String::from_utf8(output.stdout).unwrap();
     print!("{stdout}");
+}
+
+fn change_directory(arguments: &Vec<&str>) {
+    let new_path = match arguments.first() {
+        Some(p) => p,
+        None => "~",
+    };
+    match PathBuf::from_str(new_path) {
+        Ok(path) => println!("cd to {}", path.display()), // TODO: need to track what my current directory is
+        Err(path) => println!("cd: {}: no such file or directory", path),
+    };
 }
