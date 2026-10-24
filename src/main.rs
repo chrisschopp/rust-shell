@@ -29,6 +29,10 @@ impl FromStr for Cmd {
     }
 }
 
+struct Shell {
+    current_dir: PathBuf,
+}
+
 fn main() {
     loop {
         print!("$ ");
@@ -37,6 +41,10 @@ fn main() {
         io::stdin().read_line(&mut raw_input).unwrap();
         raw_input = raw_input.trim().to_string();
 
+        let mut shell = Shell {
+            current_dir: std::env::current_dir()
+                .expect("The parent of this shell should have a working directory"),
+        };
         // Split to get command and any arguments passed
         let mut splitted_inputs: Vec<&str> = raw_input.split(' ').collect();
         let command = splitted_inputs.remove(0);
@@ -44,12 +52,7 @@ fn main() {
             Ok(Cmd::Exit) => break,
             Ok(Cmd::Echo) => println!("{}", splitted_inputs.join(" ")),
             Ok(Cmd::Type) => get_type(&splitted_inputs),
-            Ok(Cmd::Pwd) => println!(
-                "{}",
-                std::env::current_dir()
-                    .expect("The parent of this shell should have a working directory")
-                    .display()
-            ),
+            Ok(Cmd::Pwd) => println!("{}", shell.current_dir.display()),
             Ok(Cmd::Cd) => change_directory(&splitted_inputs),
             _ => try_executing(command, &splitted_inputs),
         }
