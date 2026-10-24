@@ -5,6 +5,28 @@ use std::env;
 use std::io::{self, Write};
 use std::path::PathBuf;
 use std::process::{Command, Stdio};
+use std::str::FromStr;
+
+#[derive(Debug, PartialEq)]
+enum Cmd {
+    Exit,
+    Echo,
+    Type,
+    Pwd,
+}
+
+impl FromStr for Cmd {
+    type Err = String;
+    fn from_str(s: &str) -> Result<Self, Self::Err> {
+        match s {
+            "exit" => Ok(Cmd::Exit),
+            "echo" => Ok(Cmd::Echo),
+            "type" => Ok(Cmd::Type),
+            "pwd" => Ok(Cmd::Pwd),
+            unknown_cmd => Err(format!("Unknown command {}", unknown_cmd)),
+        }
+    }
+}
 
 fn main() {
     loop {
@@ -17,11 +39,11 @@ fn main() {
         // Split to get command and any arguments passed
         let mut splitted_inputs: Vec<&str> = raw_input.split(' ').collect();
         let command = splitted_inputs.remove(0);
-        match command {
-            "exit" => break,
-            "echo" => println!("{}", splitted_inputs.join(" ")),
-            "type" => get_type(&splitted_inputs),
-            "pwd" => println!(
+        match command.parse::<Cmd>() {
+            Ok(Cmd::Exit) => break,
+            Ok(Cmd::Echo) => println!("{}", splitted_inputs.join(" ")),
+            Ok(Cmd::Type) => get_type(&splitted_inputs),
+            Ok(Cmd::Pwd) => println!(
                 "{}",
                 std::env::current_dir()
                     .expect("The parent of this shell should have a working directory")
