@@ -33,6 +33,19 @@ struct Shell {
     current_dir: PathBuf,
 }
 
+impl Shell {
+    fn change_directory(mut self, arguments: &Vec<&str>) {
+        let new_dir = match arguments.first() {
+            Some(p) => p,
+            None => "~",
+        };
+        match PathBuf::from_str(new_dir) {
+            Ok(path) => self.current_dir = path.clone(),
+            Err(path) => println!("cd: {}: no such file or directory", path),
+        };
+    }
+}
+
 fn main() {
     loop {
         print!("$ ");
@@ -41,7 +54,8 @@ fn main() {
         io::stdin().read_line(&mut raw_input).unwrap();
         raw_input = raw_input.trim().to_string();
 
-        let mut shell = Shell {
+        let shell = Shell {
+            // TODO: update this with cd
             current_dir: std::env::current_dir()
                 .expect("The parent of this shell should have a working directory"),
         };
@@ -53,7 +67,7 @@ fn main() {
             Ok(Cmd::Echo) => println!("{}", splitted_inputs.join(" ")),
             Ok(Cmd::Type) => get_type(&splitted_inputs),
             Ok(Cmd::Pwd) => println!("{}", shell.current_dir.display()),
-            Ok(Cmd::Cd) => change_directory(&splitted_inputs),
+            Ok(Cmd::Cd) => shell.change_directory(&splitted_inputs),
             _ => try_executing(command, &splitted_inputs),
         }
         io::stdout().flush().unwrap();
@@ -111,15 +125,4 @@ fn execute(command: &str, arguments: &Vec<&str>) {
         .unwrap();
     let stdout = String::from_utf8(output.stdout).unwrap();
     print!("{stdout}");
-}
-
-fn change_directory(arguments: &Vec<&str>) {
-    let new_path = match arguments.first() {
-        Some(p) => p,
-        None => "~",
-    };
-    match PathBuf::from_str(new_path) {
-        Ok(path) => println!("cd to {}", path.display()), // TODO: need to track what my current directory is
-        Err(path) => println!("cd: {}: no such file or directory", path),
-    };
 }
