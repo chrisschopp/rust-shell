@@ -34,19 +34,24 @@ struct Shell {
 }
 
 impl Shell {
-    fn change_directory(mut self, arguments: &Vec<&str>) {
+    fn change_directory(&mut self, arguments: &Vec<&str>) {
         let new_dir = match arguments.first() {
             Some(p) => p,
             None => "~",
         };
-        match PathBuf::from_str(new_dir) {
-            Ok(path) => self.current_dir = path.clone(),
-            Err(path) => println!("cd: {}: no such file or directory", path),
-        };
+        let path = PathBuf::from_str(new_dir);
+        match path {
+            Ok(p) => self.current_dir = p.clone(),
+            Err(p) => println!("cd: {}: no such file or directory", p),
+        }
     }
 }
 
 fn main() {
+    let mut shell = Shell {
+        current_dir: std::env::current_dir()
+            .expect("The parent of this shell should have a working directory"),
+    };
     loop {
         print!("$ ");
         io::stdout().flush().unwrap();
@@ -54,11 +59,6 @@ fn main() {
         io::stdin().read_line(&mut raw_input).unwrap();
         raw_input = raw_input.trim().to_string();
 
-        let shell = Shell {
-            // TODO: update this with cd
-            current_dir: std::env::current_dir()
-                .expect("The parent of this shell should have a working directory"),
-        };
         // Split to get command and any arguments passed
         let mut splitted_inputs: Vec<&str> = raw_input.split(' ').collect();
         let command = splitted_inputs.remove(0);
