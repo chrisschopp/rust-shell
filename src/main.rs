@@ -39,10 +39,11 @@ impl Shell {
             Some(p) => p,
             None => "~",
         };
-        let path = PathBuf::from_str(new_dir);
-        match path {
-            Ok(p) => self.current_dir = p.clone(),
-            Err(p) => println!("cd: {}: no such file or directory", p),
+        let path = PathBuf::from_str(new_dir).unwrap();
+        if path.exists() {
+            self.current_dir = path.clone();
+        } else {
+            println!("cd: {}: No such file or directory", path.display());
         }
     }
 }
