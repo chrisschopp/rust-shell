@@ -39,9 +39,15 @@ impl Shell {
             Some(p) => p,
             None => "~",
         };
-        let path = PathBuf::from_str(new_dir).unwrap();
-        if path.exists() {
+        let path = PathBuf::from_str(new_dir).unwrap(); // can unwrap since Infallible
+        let path_is_absolute = path.exists() & path.is_absolute();
+        if path_is_absolute {
             self.current_dir = path.clone();
+        }
+
+        let abs_path = std::path::absolute(&path);
+        if abs_path.is_ok() {
+            self.current_dir = abs_path.expect("A non-final component in path is not a directory.");
         } else {
             println!("cd: {}: No such file or directory", path.display());
         }
