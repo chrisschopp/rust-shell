@@ -4,7 +4,7 @@ use std::io::{self, Write};
 use std::path::PathBuf;
 use std::process::{Command, Stdio};
 use std::str::FromStr;
-use std::{env, fs};
+use std::{env, fs, path};
 
 #[derive(Debug, PartialEq)]
 enum Cmd {
@@ -49,7 +49,7 @@ impl Shell {
     }
 
     fn try_as_relative_path(&mut self, path: PathBuf) {
-        let new_abs_path = std::path::absolute(self.current_dir.join(&path));
+        let new_abs_path = path::absolute(self.current_dir.join(&path));
         if new_abs_path.is_ok() {
             let new_canon_path = fs::canonicalize(new_abs_path.unwrap());
             if new_canon_path.as_ref().is_ok_and(|p: &PathBuf| p.exists()) {
