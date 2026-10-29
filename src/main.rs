@@ -43,11 +43,17 @@ impl Shell {
         let path_is_absolute = path.exists() & path.is_absolute();
         if path_is_absolute {
             self.current_dir = path.clone();
+        } else {
+            self.try_as_relative_path(path);
         }
+    }
 
+    fn try_as_relative_path(&mut self, path: PathBuf) {
         let abs_path = std::path::absolute(&path);
         if abs_path.is_ok() {
-            self.current_dir = abs_path.expect("A non-final component in path is not a directory.");
+            self.current_dir = self
+                .current_dir
+                .join(abs_path.expect("A non-final component in path is not a directory."));
         } else {
             println!("cd: {}: No such file or directory", path.display());
         }
