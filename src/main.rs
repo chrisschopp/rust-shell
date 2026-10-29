@@ -1,10 +1,10 @@
 use faccess::PathExt;
-use std::env;
 #[allow(unused_imports)]
 use std::io::{self, Write};
 use std::path::PathBuf;
 use std::process::{Command, Stdio};
 use std::str::FromStr;
+use std::{env, fs};
 
 #[derive(Debug, PartialEq)]
 enum Cmd {
@@ -51,9 +51,12 @@ impl Shell {
     fn try_as_relative_path(&mut self, path: PathBuf) {
         let new_abs_path = std::path::absolute(self.current_dir.join(&path));
         if new_abs_path.is_ok() {
-            // dbg!(self.current_dir.display());
-            self.current_dir = new_abs_path.unwrap();
-            // dbg!(self.current_dir.display());
+            let new_canon_path = fs::canonicalize(new_abs_path.unwrap());
+            if new_canon_path.as_ref().is_ok_and(|p: &PathBuf| p.exists()) {
+                self.current_dir = new_canon_path.unwrap();
+            } else {
+                println!("cd: {}: No such file or directory", path.display());
+            }
         } else {
             println!("cd: {}: No such file or directory", path.display());
         }
