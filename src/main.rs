@@ -54,6 +54,8 @@ impl Shell {
             let new_canon_path = fs::canonicalize(new_abs_path.unwrap());
             if new_canon_path.as_ref().is_ok_and(|p: &PathBuf| p.exists()) {
                 self.current_dir = new_canon_path.unwrap();
+            } else if path.to_str().is_some_and(|p| p.eq("~")) {
+                self.current_dir = env::home_dir().expect("No home directory found.");
             } else {
                 println!("cd: {}: No such file or directory", path.display());
             }
